@@ -3,9 +3,9 @@ package handlers
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/config"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/models"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/render"
+	"github.com/isshougai/rental-bookings/pkg/config"
+	"github.com/isshougai/rental-bookings/pkg/models"
+	"github.com/isshougai/rental-bookings/pkg/render"
 )
 
 // Repo is the repository used by the handlers

@@ -4,8 +4,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	adapter "github.com/gwatts/gin-adapter"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/config"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/handlers"
+	"github.com/isshougai/rental-bookings/pkg/config"
+	"github.com/isshougai/rental-bookings/pkg/handlers"
 )
 
 func routes(app *config.AppConfig) *gin.Engine {

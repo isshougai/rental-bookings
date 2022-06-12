@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/config"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/handlers"
-	"github.com/kugatsuno/udemy-modern-web-apps-golang/pkg/render"
+	"github.com/isshougai/rental-bookings/pkg/config"
+	"github.com/isshougai/rental-bookings/pkg/handlers"
+	"github.com/isshougai/rental-bookings/pkg/render"
 )
 
 const portNumber = ":8080"
