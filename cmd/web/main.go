@@ -54,7 +54,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// router := routes(&app)
-	// router.Run(portNumber)
 }
