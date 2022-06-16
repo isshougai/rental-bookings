@@ -19,5 +19,7 @@ func routes(app *config.AppConfig) *gin.Engine {
 	mux.GET("/", gin.HandlerFunc(handlers.Repo.Home))
 	mux.GET("/about", gin.HandlerFunc(handlers.Repo.About))
 
+	mux.Static("/static/images", "./static/images")
+
 	return mux
 }
