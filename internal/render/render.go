@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net/http"
 	"path/filepath"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isshougai/rental-bookings/pkg/config"
-	"github.com/isshougai/rental-bookings/pkg/models"
+	"github.com/isshougai/rental-bookings/internal/config"
+	"github.com/isshougai/rental-bookings/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 var functions = template.FuncMap{}
@@ -21,7 +23,8 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
@@ -42,7 +45,7 @@ func RenderTemplate(c *gin.Context, tmpl string, td *models.TemplateData) {
 
 	buf := new(bytes.Buffer)
 
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, c.Request)
 
 	_ = t.Execute(buf, td)
 
