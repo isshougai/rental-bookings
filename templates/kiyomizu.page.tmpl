@@ -2,48 +2,48 @@
 
 {{define "content"}}
 
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <img
-        src="/static/images/kiyomizu.webp"
-        class="img-fluid img-thumbnail mx-auto d-block room-image"
-        alt="room images"
-      />
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <img
+                src="/static/images/kiyomizu.webp"
+                class="img-fluid img-thumbnail mx-auto d-block room-image"
+                alt="room images"
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h1 class="text-center mt-4">Kiyomizu Suite</h1>
+        <p>
+          Experience traditional Japan, with a rich history and traditional
+          culture, this will be a holiday to remember. Experience traditional
+          Japan, with a rich history and traditional culture, this will be a
+          holiday to remember. Experience traditional Japan, with a rich history
+          and traditional culture, this will be a holiday to remember. Experience
+          traditional Japan, with a rich history and traditional culture, this
+          will be a holiday to remember.
+        </p>
+      </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col">
-      <h1 class="text-center mt-4">Kiyomizu Suite</h1>
-      <p>
-        Experience traditional Japan, with a rich history and traditional
-        culture, this will be a holiday to remember. Experience traditional
-        Japan, with a rich history and traditional culture, this will be a
-        holiday to remember. Experience traditional Japan, with a rich history
-        and traditional culture, this will be a holiday to remember. Experience
-        traditional Japan, with a rich history and traditional culture, this
-        will be a holiday to remember.
-      </p>
-    </div>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col text-center">
-    <a id="check-availability-button" href="#!" class="btn btn-success">
-      Check Availability
-    </a>
+  <div class="row">
+    <div class="col text-center">
+      <a id="check-availability-button" href="#!" class="btn btn-success">
+        Check Availability
+      </a>
+    </div>
   </div>
-</div>
 
 {{ end }}
 
 {{define "js"}}
-<script>
-  document
-    .getElementById("check-availability-button")
-    .addEventListener("click", () => {
-      let html = `
+  <script>
+      document
+          .getElementById("check-availability-button")
+          .addEventListener("click", () => {
+              let html = `
         <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
           <div class="row g-6">
             <div class="col">
@@ -59,42 +59,42 @@
           </div>
         </form>
         `;
-      attention.custom({
-        msg: html,
-        title: "Choose your dates",
+              attention.custom({
+                  msg: html,
+                  title: "Choose your dates",
 
-        willOpen: () => {
-          const elem = document.getElementById("reservation-dates-modal");
-          const rp = new DateRangePicker(elem, {
-            format: "yyyy-mm-dd",
-            showOnFocus: true,
+                  willOpen: () => {
+                      const elem = document.getElementById("reservation-dates-modal");
+                      const rp = new DateRangePicker(elem, {
+                          format: "yyyy-mm-dd",
+                          showOnFocus: true,
+                      });
+                  },
+
+                  didOpen: () => {
+                      document.getElementById("start").removeAttribute("disabled");
+                      document.getElementById("end").removeAttribute("disabled");
+                  },
+
+                  callback: function (result) {
+                      console.log("called!");
+
+                      let form = document.getElementById("check-availability-form");
+                      let formData = new FormData(form);
+                      formData.append("csrf_token", "{{.CSRFToken}}");
+
+                      fetch("/search-availability-json", {
+                          method: "post",
+                          body: formData,
+                      }).then((response) =>
+                          response.json().then((data) => {
+                              console.log(data);
+                              console.log(data.ok);
+                              console.log(data.message);
+                          })
+                      );
+                  },
+              });
           });
-        },
-
-        didOpen: () => {
-          document.getElementById("start").removeAttribute("disabled");
-          document.getElementById("end").removeAttribute("disabled");
-        },
-
-        callback: function (result) {
-          console.log("called!");
-
-          let form = document.getElementById("check-availability-form");
-          let formData = new FormData(form);
-          formData.append("csrf_token", "{{.CSRFToken}}");
-
-          fetch("/search-availability-json", {
-            method: "post",
-            body: formData,
-          }).then((response) =>
-            response.json().then((data) => {
-              console.log(data);
-              console.log(data.ok);
-              console.log(data.message);
-            })
-          );
-        },
-      });
-    });
-</script>
+  </script>
 {{ end }}
