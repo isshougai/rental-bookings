@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/isshougai/rental-bookings/internal/config"
+	"github.com/isshougai/rental-bookings/internal/forms"
 	"github.com/isshougai/rental-bookings/internal/models"
 	"github.com/isshougai/rental-bookings/internal/render"
 )
@@ -79,7 +80,47 @@ func (m *Repository) About(c *gin.Context) {
 
 // Reservation renders the make a reservation page and displays form
 func (m *Repository) Reservation(c *gin.Context) {
-	render.RenderTemplate(c, "make-reservation.page.tmpl", &models.TemplateData{})
+	var emptyReservation models.Reservation
+	data := make(map[string]interface{})
+	data["reservation"] = emptyReservation
+	render.RenderTemplate(c, "make-reservation.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
+
+// PostReservation handles the posting of a reservation form
+func (m *Repository) PostReservation(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	reservation := models.Reservation{
+		FirstName: c.PostForm("first_name"),
+		LastName:  c.PostForm("last_name"),
+		Email:     c.PostForm("email"),
+		Phone:     c.PostForm("phone"),
+	}
+
+	form := forms.New(c.Request.PostForm)
+
+	form.Required("first_name", "last_name", "email")
+	form.MinLength("first_name", 3, c)
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["reservation"] = reservation
+
+		render.RenderTemplate(c, "make-reservation.page.tmpl", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+
+		return
+	}
 }
 
 // Kiyomizu renders the Kiyomizu page
@@ -109,7 +150,7 @@ type jsonResponse struct {
 	Message string `json:"message"`
 }
 
-// AvailabilityJson handles request for availability and send JSON response
+// AvailabilityJSON handles request for availability and send JSON response
 func (m *Repository) AvailabilityJSON(c *gin.Context) {
 	resp := jsonResponse{
 		OK:      true,

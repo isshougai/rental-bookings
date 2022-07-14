@@ -25,10 +25,10 @@ func routes(app *config.AppConfig) *gin.Engine {
 	mux.POST("/search-availability", gin.HandlerFunc(handlers.Repo.PostAvailability))
 	mux.POST("/search-availability-json", gin.HandlerFunc(handlers.Repo.AvailabilityJSON))
 
-
 	mux.GET("/contact", gin.HandlerFunc(handlers.Repo.Contact))
 
 	mux.GET("/make-reservation", gin.HandlerFunc(handlers.Repo.Reservation))
+	mux.POST("/make-reservation", gin.HandlerFunc(handlers.Repo.PostReservation))
 
 	mux.Static("/static", "./static")
 
