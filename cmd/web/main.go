@@ -1,15 +1,17 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
+	"github.com/isshougai/rental-bookings/internal/models"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	"github.com/isshougai/rental-bookings/pkg/config"
-	"github.com/isshougai/rental-bookings/pkg/handlers"
-	"github.com/isshougai/rental-bookings/pkg/render"
+	"github.com/isshougai/rental-bookings/internal/config"
+	"github.com/isshougai/rental-bookings/internal/handlers"
+	"github.com/isshougai/rental-bookings/internal/render"
 )
 
 const portNumber = ":8080"
@@ -19,6 +21,9 @@ var store cookie.Store
 
 // main is the main application function
 func main() {
+	// to store in session
+	gob.Register(models.Reservation{})
+
 	app.InProduction = false
 
 	store = cookie.NewStore([]byte("secret"))

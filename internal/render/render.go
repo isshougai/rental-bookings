@@ -3,13 +3,15 @@ package render
 import (
 	"bytes"
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"log"
 	"path/filepath"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
-	"github.com/isshougai/rental-bookings/pkg/config"
-	"github.com/isshougai/rental-bookings/pkg/models"
+	"github.com/isshougai/rental-bookings/internal/config"
+	"github.com/isshougai/rental-bookings/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 var functions = template.FuncMap{}
@@ -21,7 +23,19 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+func AddDefaultData(td *models.TemplateData, c *gin.Context) *models.TemplateData {
+	session := sessions.Default(c)
+	td.Flash, _ = session.Get("flash").(string)
+	td.Error, _ = session.Get("error").(string)
+	td.Warning, _ = session.Get("warning").(string)
+	td.CSRFToken = nosurf.Token(c.Request)
+	session.Delete("flash")
+	session.Delete("error")
+	session.Delete("warning")
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+	}
 	return td
 }
 
@@ -42,7 +56,7 @@ func RenderTemplate(c *gin.Context, tmpl string, td *models.TemplateData) {
 
 	buf := new(bytes.Buffer)
 
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, c)
 
 	_ = t.Execute(buf, td)
 

@@ -1,5 +1,6 @@
 # Bookings and Reservations Web App
 
+A web app for managing bookings and reservations for Airbnb-like properties
 An easy to set-up web app for managing bookings and reservations for Airbnb-like properties
 
 - Built in Go version 1.18

@@ -1,1 +1,6 @@
 .vscode
+/.idea/vcs.xml
+/.idea/rental-bookings.iml
+/.idea/modules.xml
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/.gitignore
