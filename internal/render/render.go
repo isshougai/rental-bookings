@@ -3,8 +3,8 @@ package render
 import (
 	"bytes"
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"log"
-	"net/http"
 	"path/filepath"
 	"text/template"
 
@@ -23,8 +23,19 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
-	td.CSRFToken = nosurf.Token(r)
+func AddDefaultData(td *models.TemplateData, c *gin.Context) *models.TemplateData {
+	session := sessions.Default(c)
+	td.Flash, _ = session.Get("flash").(string)
+	td.Error, _ = session.Get("error").(string)
+	td.Warning, _ = session.Get("warning").(string)
+	td.CSRFToken = nosurf.Token(c.Request)
+	session.Delete("flash")
+	session.Delete("error")
+	session.Delete("warning")
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+	}
 	return td
 }
 
@@ -45,7 +56,7 @@ func RenderTemplate(c *gin.Context, tmpl string, td *models.TemplateData) {
 
 	buf := new(bytes.Buffer)
 
-	td = AddDefaultData(td, c.Request)
+	td = AddDefaultData(td, c)
 
 	_ = t.Execute(buf, td)
 

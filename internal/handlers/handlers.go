@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -38,7 +39,10 @@ func (m *Repository) Home(c *gin.Context) {
 	remoteIP := c.RemoteIP()
 	session := sessions.Default(c)
 	session.Set("remote_ip", remoteIP)
-	session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+	}
 
 	render.RenderTemplate(c, "home.page.tmpl", &models.TemplateData{})
 }
@@ -58,7 +62,10 @@ func (m *Repository) About(c *gin.Context) {
 		count++
 	}
 	session.Set("count", count)
-	session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+	}
 
 	var remoteIP string
 	ip := session.Get("remote_ip")
@@ -121,6 +128,15 @@ func (m *Repository) PostReservation(c *gin.Context) {
 
 		return
 	}
+
+	session := sessions.Default(c)
+	session.Set("reservation", reservation)
+	err = session.Save()
+	if err != nil {
+		log.Println(err)
+	}
+
+	c.Redirect(http.StatusSeeOther, "/reservation-summary")
 }
 
 // Kiyomizu renders the Kiyomizu page
@@ -142,7 +158,10 @@ func (m *Repository) Availability(c *gin.Context) {
 func (m *Repository) PostAvailability(c *gin.Context) {
 	start := c.PostForm("start")
 	end := c.PostForm("end")
-	c.Writer.WriteString(fmt.Sprintf("start date is %s and end date is %s", start, end))
+	_, err := c.Writer.WriteString(fmt.Sprintf("start date is %s and end date is %s", start, end))
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 type jsonResponse struct {
@@ -162,10 +181,39 @@ func (m *Repository) AvailabilityJSON(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.Writer.Write(out)
+	_, err = c.Writer.Write(out)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // Contact renders the Contact page
 func (m *Repository) Contact(c *gin.Context) {
 	render.RenderTemplate(c, "contact.page.tmpl", &models.TemplateData{})
+}
+
+// ReservationSummary returns the user the reservation summary
+func (m *Repository) ReservationSummary(c *gin.Context) {
+	session := sessions.Default(c)
+	reservation, ok := session.Get("reservation").(models.Reservation)
+	if !ok {
+		log.Println("cannot get item from session")
+		session.Set("error", "Can't get reservation from session")
+		err := session.Save()
+		if err != nil {
+			log.Println(err)
+		}
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+	session.Delete("reservation")
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+	}
+
+	data := make(map[string]interface{})
+	data["reservation"] = reservation
+
+	render.RenderTemplate(c, "reservation-summary.page.tmpl", &models.TemplateData{Data: data})
 }

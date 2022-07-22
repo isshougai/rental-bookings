@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
+	"github.com/isshougai/rental-bookings/internal/models"
 	"log"
 	"net/http"
 
@@ -19,6 +21,9 @@ var store cookie.Store
 
 // main is the main application function
 func main() {
+	// to store in session
+	gob.Register(models.Reservation{})
+
 	app.InProduction = false
 
 	store = cookie.NewStore([]byte("secret"))
